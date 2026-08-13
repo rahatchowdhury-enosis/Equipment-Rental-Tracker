@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.DS_Store
+.claude/settings.local.json
+.agentflow/
+.headroom/
+test-cases/
+test-reports/
+.claude/
+designs/
+workflow.*
+AGENTS.md
