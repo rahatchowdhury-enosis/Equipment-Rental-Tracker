@@ -7,8 +7,8 @@ Small demo app to practice PHP Essentials Part 1 + Part 2 topics (Intro through 
 ## 2. Tech Stack
 
 - PHP 8.2+
-- **Laravel 11** (routing, Eloquent ORM, Blade views, validation, auth scaffolding via Breeze — no API/SPA needed)
-- MySQL/MariaDB (Eloquent for CRUD; one deliberate raw **PDO** query for the PDO topic — see §4)
+- **Laravel 12** (routing, Eloquent ORM, Blade views, validation, auth scaffolding via Breeze — no API/SPA needed)
+- PostgreSQL (Eloquent for CRUD; one deliberate raw **PDO** query for the PDO topic — see §4)
 - Composer (Laravel's own PSR-4 autoloading, `App\` → `/app`)
 - VS Code + Xdebug3
 
