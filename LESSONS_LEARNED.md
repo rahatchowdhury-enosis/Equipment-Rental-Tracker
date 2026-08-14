@@ -7,3 +7,9 @@
 - **Issue:** [TASK-2] - Database Migrations for equipment, staff, rentals
 - **Lesson:** Unlike MySQL, Postgres does not auto-index foreign-key columns, so `foreignId()->constrained()` alone leaves `rentals.equipment_id`/`staff_id` unindexed — chaining `->index()` directly onto a `foreignId()->constrained()->cascadeOnDelete()` call also fails on Postgres (`SQLSTATE[42710]: constraint "1" already exists`, an anonymous-name collision in Laravel's fluent chain); a separate `$table->index('column')` statement after the column definitions is required instead.
 - **Action:** On Postgres, always add explicit `$table->index()` calls for FK columns that will be queried or joined on (any table a later task will filter/paginate by that FK) — never assume `constrained()` provides one, and never chain `->index()` onto a `constrained()->cascadeOnDelete()` foreignId definition.
+
+## Domain: Infrastructure
+### Component: Domain Enums
+- **Issue:** [TASK-3] - Native PHP Enums — EquipmentStatus, RentalStatus, Role, Condition
+- **Lesson:** Backed string enums matched cleanly against the plain-string columns already migrated in TASK-2, with no schema change needed; `label()` implemented as an exhaustive `match` with no `default` arm, so adding a new case later fails loudly at compile/test time instead of silently falling through.
+- **Action:** TASK-4 (Eloquent model casting) should cast these columns directly to the enum classes; keep any future `label()` additions exhaustive (no `default` arm) so new cases surface immediately.
