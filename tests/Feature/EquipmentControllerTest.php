@@ -85,6 +85,32 @@ class EquipmentControllerTest extends TestCase
         $response->assertDontSeeText($checkedOut->serial_no);
     }
 
+    public function test_index_available_names_agrees_with_eloquent_collection(): void
+    {
+        $user = User::factory()->create();
+        $available = Equipment::factory()->create(['name' => 'Canon EOS R5', 'status' => EquipmentStatus::Available]);
+        $checkedOut = Equipment::factory()->create(['name' => 'DeWalt Drill', 'status' => EquipmentStatus::CheckedOut]);
+
+        $response = $this->actingAs($user)->get(route('equipment.index'));
+
+        $response->assertOk();
+        $response->assertViewHas('equipment');
+        $response->assertViewHas('availableNames', function ($names) use ($response, $available, $checkedOut) {
+            $expected = $response->viewData('equipment')
+                ->where('status', EquipmentStatus::Available)
+                ->pluck('name')
+                ->values()
+                ->all();
+
+            sort($names);
+            sort($expected);
+
+            return $names === $expected
+                && in_array($available->name, $names, true)
+                && ! in_array($checkedOut->name, $names, true);
+        });
+    }
+
     public function test_guest_is_redirected_to_login(): void
     {
         $this->get(route('equipment.index'))->assertRedirect(route('login'));
