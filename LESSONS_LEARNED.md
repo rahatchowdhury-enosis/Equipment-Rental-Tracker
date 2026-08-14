@@ -13,3 +13,9 @@
 - **Issue:** [TASK-3] - Native PHP Enums — EquipmentStatus, RentalStatus, Role, Condition
 - **Lesson:** Backed string enums matched cleanly against the plain-string columns already migrated in TASK-2, with no schema change needed; `label()` implemented as an exhaustive `match` with no `default` arm, so adding a new case later fails loudly at compile/test time instead of silently falling through.
 - **Action:** TASK-4 (Eloquent model casting) should cast these columns directly to the enum classes; keep any future `label()` additions exhaustive (no `default` arm) so new cases surface immediately.
+
+## Domain: Infrastructure
+### Component: Eloquent Models — Equipment, Staff, Rental
+- **Issue:** [TASK-4] - Eloquent Models with relationships, enum casts, and clone-based catalog duplication
+- **Lesson:** A raw PHP `clone $original` on an Eloquent model copies full model state, including `exists` and the primary key attribute — saving it as-is does not throw, it silently `UPDATE`s the original row. Nulling `id` alone is also insufficient on Postgres: an explicit `NULL` still gets bound into the INSERT and Postgres rejects it for a `bigserial` PK (unlike SQLite, which auto-assigns a rowid). The correct pattern is `$copy->exists = false; $copy->offsetUnset('id');` before reassigning the unique field and saving — `replicate()` already does this correctly and is the framework-idiomatic path.
+- **Action:** Prefer `replicate()` over raw `clone` for persisting model duplicates; if raw `clone` is ever used for demonstration or a real feature, always pair it with `exists = false` + unsetting the PK attribute, and test that path against Postgres semantics (SQLite's `phpunit.xml` suite will not catch the NULL-PK rejection — noted from TASK-1's lesson on the same SQLite/Postgres test-parity gap).

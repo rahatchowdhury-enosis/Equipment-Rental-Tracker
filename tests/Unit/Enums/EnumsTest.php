@@ -4,8 +4,8 @@ namespace Tests\Unit\Enums;
 
 use App\Enums\Condition;
 use App\Enums\EquipmentStatus;
-use App\Enums\Role;
 use App\Enums\RentalStatus;
+use App\Enums\Role;
 use PHPUnit\Framework\TestCase;
 use ValueError;
 
