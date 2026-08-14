@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use App\Contracts\RentableInterface;
 use App\Enums\EquipmentStatus;
 use App\Models\Equipment;
 use App\Models\Rental;
@@ -160,5 +161,40 @@ class EquipmentModelTest extends TestCase
 
         $this->assertCount(2, Equipment::whereIn('serial_no', ['EXC-500', 'EXC-501'])->get());
         $this->assertEquals('EXC-500', $original->fresh()->serial_no);
+    }
+
+    /**
+     * Test Equipment implements RentableInterface.
+     */
+    public function test_equipment_implements_rentable_interface(): void
+    {
+        $this->assertInstanceOf(RentableInterface::class, new Equipment);
+    }
+
+    /**
+     * Test isAvailable() reflects the status enum correctly.
+     */
+    public function test_is_available_reflects_status_enum(): void
+    {
+        $available = Equipment::factory()->make(['status' => EquipmentStatus::Available]);
+        $checkedOut = Equipment::factory()->make(['status' => EquipmentStatus::CheckedOut]);
+
+        $this->assertTrue($available->isAvailable());
+        $this->assertFalse($checkedOut->isAvailable());
+    }
+
+    /**
+     * Test markCheckedOut()/markAvailable() mutate status without saving.
+     */
+    public function test_mark_checked_out_and_mark_available_mutate_status_only(): void
+    {
+        $equipment = Equipment::factory()->create(['status' => EquipmentStatus::Available]);
+
+        $equipment->markCheckedOut();
+        $this->assertEquals(EquipmentStatus::CheckedOut, $equipment->status);
+        $this->assertEquals(EquipmentStatus::Available, $equipment->fresh()->status);
+
+        $equipment->markAvailable();
+        $this->assertEquals(EquipmentStatus::Available, $equipment->status);
     }
 }

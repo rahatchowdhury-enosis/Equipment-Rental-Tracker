@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\RentableInterface;
 use App\Enums\Condition;
 use App\Enums\EquipmentStatus;
 use Illuminate\Database\Eloquent\Builder;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Equipment extends Model
+class Equipment extends Model implements RentableInterface
 {
     use HasFactory;
 
@@ -40,6 +41,21 @@ class Equipment extends Model
     public function __toString(): string
     {
         return "{$this->name} ({$this->serial_no})";
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->status === EquipmentStatus::Available;
+    }
+
+    public function markCheckedOut(): void
+    {
+        $this->status = EquipmentStatus::CheckedOut;
+    }
+
+    public function markAvailable(): void
+    {
+        $this->status = EquipmentStatus::Available;
     }
 
     /**
