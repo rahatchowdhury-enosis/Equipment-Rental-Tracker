@@ -18,9 +18,9 @@ class EquipmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(2, true),
-            'category' => fake()->word(),
-            'serial_no' => fake()->unique()->regexify('[A-Z]{3}-[0-9]{6}'),
+            'name' => fake()->randomElement(['Canon EOS R5', 'DeWalt Drill', 'Shure SM7B', 'Pioneer DJ Controller']),
+            'category' => fake()->randomElement(['camera', 'tool', 'av']),
+            'serial_no' => strtoupper(fake()->unique()->bothify('??-####')),
             'photo' => null,
             'condition' => Condition::Good,
             'status' => EquipmentStatus::Available,

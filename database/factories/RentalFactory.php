@@ -27,4 +27,30 @@ class RentalFactory extends Factory
             'status' => RentalStatus::Active,
         ];
     }
+
+    /**
+     * Overdue: past-due, still active, not returned.
+     */
+    public function overdue(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'checked_out_at' => now()->subDays(10),
+            'due_at' => now()->subDays(3),
+            'returned_at' => null,
+            'status' => RentalStatus::Active,
+        ]);
+    }
+
+    /**
+     * Returned: completed rental cycle.
+     */
+    public function returned(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'checked_out_at' => now()->subDays(14),
+            'due_at' => now()->subDays(7),
+            'returned_at' => now()->subDays(5),
+            'status' => RentalStatus::Returned,
+        ]);
+    }
 }
