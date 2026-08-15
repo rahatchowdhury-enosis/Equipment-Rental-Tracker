@@ -29,6 +29,12 @@
 
             <!-- Page Content -->
             <main>
+                @if ($errors->has('equipment'))
+                    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 pt-6">
+                        <div class="mb-4 font-medium text-sm text-red-600">{{ $errors->first('equipment') }}</div>
+                    </div>
+                @endif
+
                 {{ $slot }}
             </main>
         </div>
