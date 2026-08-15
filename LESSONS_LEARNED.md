@@ -74,6 +74,12 @@
 - **Lesson:** The design doc's illustrative code block put `MaxLength`, `DemoDto`, and `AttributeValidatorDemo` in one file — PSR-4 autoloading maps one class per file to a matching filename, so `DemoDto` (in a file named `AttributeValidatorDemo.php`) fails to autoload (`Class "App\Playground\DemoDto" not found`) until split into its own file. Separately, `ReflectionProperty::getValue($target)` throws `Error: must not be accessed before initialization` for any typed property with no default and no value set — the design doc's `is_string($value)` guard only filters non-string values, it never protects against reading an uninitialized typed property at all, so pointing `validate()` at a caller's own DTO with a no-default property (the demo's actual use case) fatals before the guard even runs.
 - **Action:** When a design doc's code sample groups multiple classes in one fenced block for readability, treat that as illustrative only — split into one file per class per PSR-4 before implementing. Any Reflection-based property reader that will be pointed at arbitrary caller objects must check `ReflectionProperty::isInitialized($target)` before calling `getValue()`, not just type-check the returned value — a type guard runs too late to catch an uninitialized-property fatal.
 
+## Domain: Language Fundamentals
+### Component: Manual serialize()/__sleep/__wakeup (Playground)
+- **Issue:** [TASK-15] - Playground — Manual serialize()/unserialize() with __sleep/__wakeup
+- **Lesson:** `$internalNote` is `private`, so proving `__sleep()` excluded it and `__wakeup()` re-derived it (the whole point of the demo, per the design's own test strategy) needed a public accessor — the design doc's illustrative snippet had no getter, since it only showed `run()` returning the object for manual/tinker inspection, not an automated-test contract.
+- **Action:** When a design doc's illustrative snippet exercises a private/protected property's serialization behavior but the test strategy requires asserting on that property, add the minimal accessor needed for the assertion rather than treating the snippet as a literal closed contract — same "illustrative, not literal" lesson as TASK-14, now applied to encapsulation rather than file-splitting.
+
 ## Domain: Web CRUD
 ### Component: EquipmentController — CRUD, Photo Upload, Duplicate
 - **Issue:** [TASK-8] - Equipment CRUD — Controller, Views, Photo Upload
