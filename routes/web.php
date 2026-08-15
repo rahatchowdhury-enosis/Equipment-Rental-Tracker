@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RentalController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/equipment/{equipment}/duplicate', [EquipmentController::class, 'duplicate'])->name('equipment.duplicate');
 
     Route::resource('staff', StaffController::class);
+
+    Route::get('rentals', [RentalController::class, 'index'])->name('rentals.index');
+    Route::get('rentals/create', [RentalController::class, 'create'])->name('rentals.create');
+    Route::post('rentals', [RentalController::class, 'store'])->name('rentals.store');
+    Route::post('rentals/{rental}/return', [RentalController::class, 'returnRental'])->name('rentals.return');
 });
 
 require __DIR__.'/auth.php';

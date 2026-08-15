@@ -28,7 +28,7 @@ class RentalService extends BaseService
                 throw EquipmentNotAvailableException::forEquipment($equipment);
             }
 
-            if ($staff->activeRentals()->lockForUpdate()->count() >= 3) {
+            if ($staff->activeRentals()->lockForUpdate()->get()->count() >= 3) {
                 throw new \DomainException("{$staff->name} already has 3 active rentals.");
             }
 
