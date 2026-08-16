@@ -22,11 +22,11 @@
                 <div class="mt-6 flex items-center gap-4">
                     <a href="{{ route('staff.edit', $staff) }}" class="text-sm text-indigo-600 underline">{{ __('Edit') }}</a>
 
-                    <form method="POST" action="{{ route('staff.destroy', $staff) }}" onsubmit="return confirm('Delete this staff member?')">
-                        @csrf
-                        @method('DELETE')
-                        <x-danger-button type="submit">{{ __('Delete') }}</x-danger-button>
-                    </form>
+                    <x-confirm-delete
+                        name="confirm-staff-deletion"
+                        :action="route('staff.destroy', $staff)"
+                        message="{{ __('Delete this staff member?') }}"
+                    />
 
                     <a href="{{ route('staff.index') }}" class="text-sm text-gray-600 underline">{{ __('Back') }}</a>
                 </div>

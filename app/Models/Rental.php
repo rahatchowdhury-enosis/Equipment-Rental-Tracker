@@ -15,6 +15,8 @@ class Rental extends Model
 
     const MAX_EXTENSIONS = 1;
 
+    const LATE_FEE_CENTS_PER_DAY = 500;
+
     protected $table = self::TABLE;
 
     protected $fillable = ['equipment_id', 'staff_id', 'checked_out_at', 'due_at', 'returned_at', 'status'];
@@ -27,6 +29,16 @@ class Rental extends Model
             'returned_at' => 'datetime',
             'status' => RentalStatus::class,
         ];
+    }
+
+    /**
+     * Fee owed right now: final once returned, still accruing while active.
+     */
+    public function lateFeeCents(): int
+    {
+        $daysLate = max(0, days_between($this->due_at, $this->returned_at ?? now()));
+
+        return $daysLate * self::LATE_FEE_CENTS_PER_DAY;
     }
 
     public function equipment(): BelongsTo

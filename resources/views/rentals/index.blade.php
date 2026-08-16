@@ -25,6 +25,7 @@
                             <th class="px-6 py-3">Equipment</th>
                             <th class="px-6 py-3">Staff</th>
                             <th class="px-6 py-3">Due</th>
+                            <th class="px-6 py-3">Late Fee</th>
                             <th class="px-6 py-3">Status</th>
                             <th class="px-6 py-3"></th>
                         </tr>
@@ -41,6 +42,13 @@
                                         <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700">
                                             {{ $daysOverdue }} days overdue
                                         </span>
+                                    @endif
+                                </td>
+                                @php($lateFeeCents = $rental->lateFeeCents())
+                                <td class="px-6 py-4 {{ $lateFeeCents > 0 ? 'font-semibold text-red-700' : 'text-gray-400' }}">
+                                    {{ format_late_fee($lateFeeCents) }}
+                                    @if ($lateFeeCents > 0 && $rental->status === \App\Enums\RentalStatus::Active)
+                                        <span class="block text-xs font-normal text-gray-500">accruing</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">{{ $rental->status->label() }}</td>
@@ -60,7 +68,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 text-gray-400">No rentals found.</td>
+                                <td colspan="6" class="px-6 py-4 text-gray-400">No rentals found.</td>
                             </tr>
                         @endforelse
                     </tbody>

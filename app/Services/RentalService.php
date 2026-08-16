@@ -80,8 +80,6 @@ class RentalService extends BaseService
 
     public function calculateLateFee(Rental $rental): int
     {
-        $daysLate = max(0, days_between($rental->due_at, $rental->returned_at ?? now()));
-
-        return $daysLate * 500;
+        return $rental->lateFeeCents();
     }
 }

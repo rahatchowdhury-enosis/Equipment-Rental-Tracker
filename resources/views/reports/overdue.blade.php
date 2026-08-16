@@ -15,6 +15,7 @@
                             <th class="px-6 py-3">Staff</th>
                             <th class="px-6 py-3">Due</th>
                             <th class="px-6 py-3">Days Overdue</th>
+                            <th class="px-6 py-3">Late Fee</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -23,15 +24,19 @@
                                 <td class="px-6 py-4">{{ $row['equipment_name'] }}</td>
                                 <td class="px-6 py-4">{{ $row['staff_name'] }}</td>
                                 <td class="px-6 py-4">{{ \Illuminate\Support\Carbon::parse($row['due_at'])->format('Y-m-d') }}</td>
+                                @php($daysOverdue = days_between(\Illuminate\Support\Carbon::parse($row['due_at']), now()))
                                 <td class="px-6 py-4">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700">
-                                        {{ days_between(\Illuminate\Support\Carbon::parse($row['due_at']), now()) }} days overdue
+                                        {{ $daysOverdue }} days overdue
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 font-semibold text-red-700">
+                                    {{ format_late_fee(max(0, $daysOverdue) * \App\Models\Rental::LATE_FEE_CENTS_PER_DAY) }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-4 text-gray-400">No overdue equipment.</td>
+                                <td colspan="5" class="px-6 py-4 text-gray-400">No overdue equipment.</td>
                             </tr>
                         @endforelse
                     </tbody>

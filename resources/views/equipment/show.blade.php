@@ -41,11 +41,11 @@
                         <x-secondary-button type="submit">{{ __('Duplicate') }}</x-secondary-button>
                     </form>
 
-                    <form method="POST" action="{{ route('equipment.destroy', $equipment) }}" onsubmit="return confirm('Delete this equipment?')">
-                        @csrf
-                        @method('DELETE')
-                        <x-danger-button type="submit">{{ __('Delete') }}</x-danger-button>
-                    </form>
+                    <x-confirm-delete
+                        name="confirm-equipment-deletion"
+                        :action="route('equipment.destroy', $equipment)"
+                        message="{{ __('Delete this equipment?') }}"
+                    />
 
                     <a href="{{ route('equipment.index') }}" class="text-sm text-gray-600 underline">{{ __('Back') }}</a>
                 </div>
