@@ -1,66 +1,102 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Equipment Rental Tracker
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel demo app for practicing PHP Essentials Part 1 + Part 2 (Intro through PDO). Staff check out equipment (cameras, drills, AV kit), track due-back dates, condition, and late fees.
 
-## About Laravel
+## Prerequisites
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.2+
+- Composer
+- PostgreSQL
+- Node.js (for Breeze/Vite frontend assets)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Setup
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+git clone <repo-url>
+cd equipment-rental-tracker
+composer install
+npm install && npm run build
+cp .env.example .env
+```
 
-## Learning Laravel
+Create the Postgres role + database if they don't already exist:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```sql
+CREATE ROLE equipment_rental LOGIN PASSWORD 'your-password-here';
+CREATE DATABASE equipment_rental_tracker OWNER equipment_rental;
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Set `DB_USERNAME`/`DB_PASSWORD` in `.env` to match, then:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+php artisan key:generate
+php artisan storage:link
+php artisan migrate --seed
+```
 
-## Laravel Sponsors
+Serve the app:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+composer run dev   # runs php artisan serve + queue:listen + pail + vite, concurrently
+```
 
-### Premium Partners
+## Xdebug / VS Code
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+`.vscode/launch.json` ships a "Listen for Xdebug" configuration on port 9003. Enable Xdebug in your PHP install, set breakpoints, then run the launch config from VS Code's Run and Debug panel before hitting a route.
 
-## Contributing
+## PHP Essentials — topic map
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Topic | Where |
+|---|---|
+| Dates & Times | `app/Services/RentalService.php` (due-date/late-fee math via Carbon) |
+| Operators, Control Structures | `app/Services/RentalService.php`, controllers |
+| Arrays (raw `array_filter`/`array_map`) | `app/Http/Controllers/EquipmentController.php` |
+| Functions | `app/helpers.php`, `app/Services/RentalService.php` |
+| Variables & Data Types (typed properties, `strict_types`) | `app/Services/*`, `app/DTOs/EquipmentSummary.php` |
+| IDE/Xdebug | `.vscode/launch.json` |
+| Classes & Objects, OOP Intro | `app/Models/Equipment.php`, `Staff.php`, `Rental.php` |
+| Namespaces | throughout `app/` (framework PSR-4) |
+| Code Style (PSR-12) | enforced via `./vendor/bin/pint` |
+| Autoloading | `composer.json` (`App\` → `/app`) |
+| Class Constants | `app/Models/Equipment.php`, `app/Models/Rental.php` |
+| Magic Methods | `app/Models/Equipment.php::__toString()` |
+| Static Properties/Methods, Late Static Binding | `app/Models/Equipment.php::available()` (framework LSB); `app/DTOs/EquipmentSummary.php::create()` (custom static factory) |
+| Principles of OOP (interfaces, abstract classes) | `app/Contracts/RentableInterface.php`, `app/Services/BaseService.php` |
+| Enums | `app/Enums/EquipmentStatus.php`, `RentalStatus.php`, `Role.php`, `Condition.php` |
+| Traits | `app/Traits/Loggable.php` (used by `RentalService`) |
+| Attributes | `app/Attributes/Validate/MaxLength.php` + `app/Playground/AttributeValidatorDemo.php` (standalone Reflection reader) |
+| Anonymous Classes | `app/Http/Controllers/StaffController.php` (`GuestStaff` null object) |
+| Working with Objects (clone/duplicate) | `app/Models/Equipment.php::duplicateWithSerial()` (via `replicate()`) |
+| Serialization | `app/Playground/SerializationDemo.php` + `app/Playground/RentalHistoryRecord.php` (manual `serialize()`/`__sleep`/`__wakeup`); Eloquent `toJson()` used elsewhere |
+| Exception Handling | `app/Exceptions/EquipmentNotAvailableException.php`, `bootstrap/app.php` renderable handler |
+| Superglobals & Basic Routing | `app/Http/Controllers/EquipmentController.php` (raw `$_GET`/`$_POST`/`$_SERVER` dump, local-only) |
+| Forms | `app/Http/Requests/StoreEquipmentRequest.php`, `StoreStaffRequest.php` |
+| Sessions & Cookies | Breeze session auth (`routes/auth.php`) |
+| File Uploading | `app/Http/Controllers/EquipmentController.php` (`Storage::disk('public')`) |
+| MVC Pattern | `routes/web.php` → controllers → models → `resources/views` |
+| PDO | `app/Http/Controllers/ReportController.php::overdue()` (raw `DB::connection()->getPdo()` query) |
 
-## Code of Conduct
+## Running the Playground demos
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+The standalone demos in `app/Playground/` sit outside the normal app flow — run them via `tinker`:
 
-## Security Vulnerabilities
+```bash
+php artisan tinker
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```php
+// Attribute + Reflection validator
+$dto = new App\Playground\DemoDto();
+$dto->title = str_repeat('x', 200);
+App\Playground\AttributeValidatorDemo::validate($dto);
 
-## License
+// Manual serialize()/__sleep/__wakeup
+App\Playground\SerializationDemo::run();
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Tests
+
+```bash
+php artisan test          # PHPUnit suite (SQLite in-memory)
+./vendor/bin/pint --test  # confirm PSR-12 formatting, no diffs
+```
